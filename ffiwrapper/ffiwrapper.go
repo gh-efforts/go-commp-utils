@@ -81,7 +81,7 @@ func ZeroPadPieceCommitment(c cid.Cid, curSize abi.UnpaddedPieceSize, toSize abi
 
 		zc := zerocomm.ZeroPieceCommitment(curSize)
 
-		p, err := ffi.GenerateUnsealedCID(abi.RegisteredSealProof_StackedDrg32GiBV1, []abi.PieceInfo{
+		p, err := ffi.GenerateUnsealedCID(abi.RegisteredSealProof_StackedDrg64GiBV1, []abi.PieceInfo{
 			abi.PieceInfo{
 				Size:     curSize.Padded(),
 				PieceCID: cur,

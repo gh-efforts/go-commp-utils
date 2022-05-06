@@ -35,7 +35,7 @@ type Writer struct {
 	buf    [CommPBuf]byte
 	leaves []chan ciderr
 
-	tbufs [][CommPBuf]byte
+	tbufs    [][CommPBuf]byte
 	throttle chan int
 }
 
@@ -72,7 +72,7 @@ func (w *Writer) Write(p []byte) (int, error) {
 					w.throttle <- bufIdx
 				}()
 
-				l, err := ffiwrapper.GeneratePieceCIDFromFile(abi.RegisteredSealProof_StackedDrg32GiBV1, bytes.NewReader(w.tbufs[bufIdx][:]), CommPBuf)
+				l, err := ffiwrapper.GeneratePieceCIDFromFile(abi.RegisteredSealProof_StackedDrg64GiBV1, bytes.NewReader(w.tbufs[bufIdx][:]), CommPBuf)
 				leaf <- ciderr{
 					c:   l,
 					err: err,
@@ -92,7 +92,7 @@ func (w *Writer) Sum() (DataCIDSize, error) {
 
 	leaves := make([]cid.Cid, len(w.leaves))
 	for i, leaf := range w.leaves {
-		r := <- leaf
+		r := <-leaf
 		if r.err != nil {
 			return DataCIDSize{}, xerrors.Errorf("processing leaf %d: %w", i, r.err)
 		}
@@ -107,7 +107,7 @@ func (w *Writer) Sum() (DataCIDSize, error) {
 		}
 
 		r, sz := padreader.New(bytes.NewReader(w.buf[:lastLen]), uint64(lastLen))
-		p, err := ffiwrapper.GeneratePieceCIDFromFile(abi.RegisteredSealProof_StackedDrg32GiBV1, r, sz)
+		p, err := ffiwrapper.GeneratePieceCIDFromFile(abi.RegisteredSealProof_StackedDrg64GiBV1, r, sz)
 		if err != nil {
 			return DataCIDSize{}, err
 		}
@@ -145,7 +145,7 @@ func (w *Writer) Sum() (DataCIDSize, error) {
 		}
 	}
 
-	p, err := ffi.GenerateUnsealedCID(abi.RegisteredSealProof_StackedDrg32GiBV1, pieces)
+	p, err := ffi.GenerateUnsealedCID(abi.RegisteredSealProof_StackedDrg64GiBV1, pieces)
 	if err != nil {
 		return DataCIDSize{}, xerrors.Errorf("generating unsealed CID: %w", err)
 	}

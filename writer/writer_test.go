@@ -56,7 +56,7 @@ func TestWriterData(t *testing.T) {
 	data, _ := ioutil.ReadAll(io.LimitReader(rand.Reader, int64(dataLen)))
 
 	pr, sz := padreader.New(bytes.NewReader(data), uint64(dataLen))
-	exp, err := ffiwrapper.GeneratePieceCIDFromFile(abi.RegisteredSealProof_StackedDrg32GiBV1, pr, sz)
+	exp, err := ffiwrapper.GeneratePieceCIDFromFile(abi.RegisteredSealProof_StackedDrg64GiBV1, pr, sz)
 	require.NoError(t, err)
 
 	w := &Writer{}
