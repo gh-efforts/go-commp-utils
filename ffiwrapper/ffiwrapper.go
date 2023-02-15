@@ -1,6 +1,7 @@
 package ffiwrapper
 
 import (
+	"bufio"
 	"io"
 	"os"
 	"sync"
@@ -37,11 +38,18 @@ func ToReadableFile(r io.Reader, n int64) (*os.File, func() error, error) {
 		defer wait.Unlock()
 
 		var copied int64
-		copied, werr = io.CopyN(w, r, n)
+		// add write buff 32MB
+		bw := bufio.NewWriterSize(w, 33554432)
+		copied, werr = io.CopyN(bw, r, n)
 		if werr != nil {
 			log.Warnf("toReadableFile: copy error: %+v", werr)
 		}
 
+		ferr := bw.Flush()
+
+		if ferr != nil {
+			log.Warnf("toReadableFile: flush error: %+v", ferr)
+		}
 		err := w.Close()
 		if werr == nil && err != nil {
 			werr = err
